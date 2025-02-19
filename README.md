@@ -36,6 +36,7 @@ projects:
 
 ### Run atlantis
 ```bash
+chmod +x ./start-atlantis.sh
 ./start-atlantis.sh
 ```
 
