@@ -1,0 +1,61 @@
+# repos:
+#   - id: /.*/
+#     # plan_requirements sets the Plan Requirements for all repos that match.
+#     plan_requirements: [mergeable]
+#     # apply_requirements sets the Apply Requirements for all repos that match.
+#     apply_requirements: [mergeable]  
+#     allowed_overrides: ["plan_requirements", "apply_requirements", "workflow"]
+#     pre_workflow_hooks:
+#       - run: "cat ~/Downloads/devFndAssignments/Assignment4/tech4deviac/gitops-with-atlantis/atlantis.yaml > atlantis.yaml"
+
+# workflows:
+#   poc:
+#     plan:
+#       steps:
+#         - env:
+#             name: TF_WORKSPACE
+#             command: echo $WORKSPACE
+#         - init
+#         - plan:
+#             extra_args: ["-var-file=tfvars/$WORKSPACE.tfvars"]
+#     apply:
+#       steps:
+#         - env:
+#             name: TF_WORKSPACE
+#             command: echo $WORKSPACE
+#         - apply: 
+#             extra_args: ["-var-file=tfvars/$WORKSPACE.tfvars"]
+
+repos:
+  - id: /.*/
+    plan_requirements: [mergeable]
+    apply_requirements: [mergeable]  
+    allowed_overrides: ["plan_requirements", "apply_requirements", "workflow"]
+    
+    pre_workflow_hooks:
+      # 1️⃣ Check if Atlantis is running before proceeding
+      - run: |
+          if ! pgrep -f "atlantis server"; then
+            echo "❌ ERROR: Atlantis is not running! Please start it before proceeding."
+            exit 1
+          fi
+      # 2️⃣ Copy `atlantis.yaml` before workflow execution
+      - run: "cp ~/Downloads/devFndAssignments/Assignment4/gitops-with-atlantis/atlantis.yaml ./atlantis.yaml"
+
+workflows:
+  poc:
+    plan:
+      steps:
+        - env:
+            name: TF_WORKSPACE
+            command: echo $WORKSPACE
+        - init
+        - plan:
+            extra_args: ["-var-file=tfvars/$WORKSPACE.tfvars"]
+    apply:
+      steps:
+        - env:
+            name: TF_WORKSPACE
+            command: echo $WORKSPACE
+        - apply:
+            extra_args: ["-var-file=tfvars/$WORKSPACE.tfvars"]  
